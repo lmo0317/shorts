@@ -31,13 +31,26 @@ def _wrap_by_pixel(text, font, draw, max_w):
         lines.append(cur)
     return lines
 
-def make_frame(image_path, narration):
+def make_frame(image_path, display_text):
     canvas = Image.new("RGB", (W, H), BLACK)
 
     img = Image.open(image_path).convert("RGB")
-    img_h = IMG_BOTTOM - IMG_TOP
-    img = img.resize((W, img_h), Image.LANCZOS)
-    canvas.paste(img, (0, IMG_TOP))
+    img_w, img_h = img.size
+    crop_h = IMG_BOTTOM - IMG_TOP
+    if img_w >= img_h:
+        new_w = max(W, int(crop_h * img_w / img_h))
+        new_h = crop_h
+        if new_w < W:
+            new_w = W
+            new_h = int(W * img_h / img_w)
+    else:
+        new_w = W
+        new_h = max(crop_h, int(W * img_h / img_w))
+    img_resized = img.resize((new_w, new_h), Image.LANCZOS)
+
+    paste_x = (W - new_w) // 2
+    paste_y = IMG_TOP + (crop_h - new_h) // 2
+    canvas.paste(img_resized, (paste_x, paste_y))
 
     canvas_rgba = canvas.convert("RGBA")
 
@@ -60,10 +73,10 @@ def make_frame(image_path, narration):
     draw = ImageDraw.Draw(canvas)
     font = ImageFont.truetype(FONT_BOLD_PATH, 88)
 
-    if "\n" in narration:
-        raw_lines = narration.split("\n", 1)
+    if "\n" in display_text:
+        raw_lines = display_text.split("\n", 1)
     else:
-        raw_lines = narration.split(",", 1) if "," in narration else [narration]
+        raw_lines = display_text.split(",", 1) if "," in display_text else [display_text]
 
     line1 = raw_lines[0].strip()[:12] if len(raw_lines) > 0 else ""
     line2 = raw_lines[1].strip()[:12] if len(raw_lines) > 1 else ""
@@ -83,24 +96,29 @@ def make_frame(image_path, narration):
 
     return canvas
 
-def create_clips(image_paths, audio_paths, durations, narrations=None):
+def create_clips(image_paths, audio_paths, durations, scenes=None):
     os.makedirs(VIDEO_DIR, exist_ok=True)
 
-    if narrations is None:
+    if scenes is None:
         scenes_path = os.path.join(OUTPUT_DIR, "scenes.json")
         if os.path.exists(scenes_path):
             with open(scenes_path) as f:
                 scenes = json.load(f)
-            narrations = [s["narration"] for s in scenes]
 
     for i in range(len(image_paths)):
         scene = i + 1
         frame_path = os.path.join(VIDEO_DIR, f"frame_{scene}.png")
         clip_path = os.path.join(VIDEO_DIR, f"clip_{scene}.mp4")
 
-        nar = narrations[i] if narrations and i < len(narrations) else ""
-        frame = make_frame(image_paths[i], nar)
+        display_text = ""
+        if scenes and i < len(scenes):
+            s = scenes[i]
+            display_text = s.get("display_text", s.get("narration", ""))
+
+        frame = make_frame(image_paths[i], display_text)
         frame.save(frame_path)
+
+        total_dur = durations[i] + 5.0
 
         cmd = [
             "ffmpeg", "-y",
@@ -111,11 +129,10 @@ def create_clips(image_paths, audio_paths, durations, narrations=None):
             "-c:a", "aac",
             "-pix_fmt", "yuv420p",
             "-r", "30",
-            "-t", f"{durations[i]:.2f}",
-            "-shortest",
+            "-t", f"{total_dur:.2f}",
             clip_path
         ]
-        subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        subprocess.run(cmd, capture_output=True, text=True, timeout=120)
 
     concat_path = os.path.join(VIDEO_DIR, "concat.txt")
     with open(concat_path, "w") as f:

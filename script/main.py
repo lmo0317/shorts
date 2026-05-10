@@ -72,7 +72,7 @@ def main(num_articles=1):
 
         log("영상 합성 중...")
         try:
-            final_path, share_path, final_dur = create_clips(image_paths, audio_paths, durations, narrations)
+            final_path, share_path, final_dur = create_clips(image_paths, audio_paths, durations, scenes)
         except Exception as e:
             log(f"영상 합성 실패: {e}")
             continue

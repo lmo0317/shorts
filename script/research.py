@@ -42,6 +42,7 @@ def search_natepann(keyword, limit=10):
                     "source": "natepann",
                     "views": views,
                     "views_int": views_int,
+                    "body_length": len(body) if body else 0,
                     "body_snippet": re.sub(r'\s+', ' ', body[:150]).strip() if body else ""
                 })
 
@@ -126,13 +127,14 @@ def format_results(nate_results, youtube_results):
     lines.append("📝 네이트판")
     lines.append("=" * 70)
     lines.append("")
-    lines.append("| # | 제목 | 간략 내용 | 조회수/댓글 |")
-    lines.append("|---|------|----------|------------|")
+    lines.append("| # | 제목 | 간략 내용 | 조회수 | 본문길이 |")
+    lines.append("|---|------|----------|--------|----------|")
     for i, r in enumerate(nate_results, 1):
         title = r["title"][:40]
         views = r.get("views", "N/A")
         snippet = r.get("body_snippet", "")[:60] if r.get("body_snippet") else "-"
-        lines.append(f"| {i} | {title} | {snippet} | {views} |")
+        body_len = r.get("body_length", 0)
+        lines.append(f"| {i} | {title} | {snippet} | {views} | {body_len}자 |")
 
     return "\n".join(lines)
 

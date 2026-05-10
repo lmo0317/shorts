@@ -23,7 +23,7 @@ Search YouTube Shorts AND NatePann for trending content. Default keyword: 연애
 1. Run: `cd /home/lmo0317/shorts_v2/script && /home/lmo0317/comfy/ComfyUI/venv/bin/python3 research.py [KEYWORD]`
 2. Options: `--nate N`, `--youtube N`, `--ranking`, `--json`
 3. If script results are insufficient (especially YouTube), supplement with Task tool (subagent_type "general") web searches
-4. Present results as TWO formatted tables:
+4. Present results as TWO formatted tables. NatePann table includes **본문길이** column — prefer articles with 200+ characters for longer videos.
 
 **YouTube Shorts:**
 
@@ -32,19 +32,18 @@ Search YouTube Shorts AND NatePann for trending content. Default keyword: 연애
 
 **네이트판:**
 
-| # | 제목 | 간략 내용 | 조회수/댓글 |
-|---|------|----------|------------|
+| # | 제목 | 간략 내용 | 조회수 | 본문길이 |
+|---|------|----------|--------|----------|
 
 5. Ask: "어떤 걸 각색할까요?"
 
 ### `/shorts 제작 [대본파일]` — Video Production
 
-Run the full shorts pipeline to generate a final video.
+Run the full shorts pipeline to generate a final video (~90 seconds).
 
 **Examples:**
 - `/shorts 제작` — run pipeline with NatePann top article (default)
 - `/shorts 제작 대본.md` — run pipeline using a custom script file
-- `/shorts 제작 scenes.json` — run pipeline using existing scenes
 
 **Steps:**
 
@@ -53,34 +52,26 @@ If no argument provided (default):
 cd /home/lmo0317/shorts_v2/script && /home/lmo0317/comfy/ComfyUI/venv/bin/python3 main.py --articles 1
 ```
 
-If a script file is provided:
-1. Read the file at the given path
-2. Parse it as a JSON array of scenes with `scene`, `summary`, `narration` (2 lines, `\n` separated, max 12 chars each), and `image_prompt` fields
-3. Save to `/home/lmo0317/shorts_v2/output/scenes.json`
-4. Generate images → free GPU → TTS → video assembly
+## Pipeline Architecture
 
-**Skip steps:** If `--skip-research` or `--skip-images` flags are mentioned, skip the corresponding pipeline steps.
-
-## Pipeline Order (for 제작 mode)
-
-1. Crawl articles (`crawler.py`) — unless custom script provided
-2. AI rewrite (`ai_rewrite.py`) — produces 2-line narrations per scene
-3. Generate images (remote ComfyUI at `192.168.219.120:8000`)
-4. Free local GPU memory (`free_comfy_memory()`)
-5. Generate TTS (local Qwen3-TTS-0.6B)
-6. Assemble video (`video_edit.py`) → output to `/home/lmo0317/share/final.mp4`
+- **Image**: 1024x1024 (1:1 square), then fitted into video layout
+- **Video**: 1080x1920 portrait (9:16 shorts)
+- **Scenes**: 6 scenes for ~90 seconds total
+- **display_text**: 2 lines, max 12 chars each (white + gold, shown on screen)
+- **narration**: 50~80 chars per scene (for TTS voiceover)
+- **Target duration**: ~15 seconds per scene × 6 = ~90 seconds
 
 ## Key Files
 
 - `script/main.py` — Pipeline orchestrator
 - `script/crawler.py` — NatePann scraper (`get_top_by_views()`)
-- `script/ai_rewrite.py` — DeepSeek V4 Flash rewrite
-- `script/tts.py` — Qwen3-TTS generation
-- `script/image_gen.py` — Remote ComfyUI API
-- `script/video_edit.py` — Styled frame composition + ffmpeg
+- `script/ai_rewrite.py` — DeepSeek V4 Flash rewrite (produces display_text + narration)
+- `script/tts.py` — Qwen3-TTS generation (reads narration, NOT display_text)
+- `script/image_gen.py` — Remote ComfyUI API (1024x1024 images)
+- `script/video_edit.py` — Styled frame composition (uses display_text for overlay)
 - `script/research.py` — Content research script (YouTube + NatePann)
-- `script/config.py` — All configuration
-- `script/templates/system_prompt.txt` — LLM rewrite prompt (2-line narration, max 12 chars each)
+- `script/config.py` — All configuration (NUM_SCENES=6, 1024x1024 workflow)
+- `script/templates/system_prompt.txt` — LLM rewrite prompt
 
 ## Video Layout (matching reference screenshot)
 
@@ -88,22 +79,22 @@ If a script file is provided:
 - White text (255,255,255) at y=14.9%, Bold 88px
 - Gold text (252,208,20) at y=21%, Bold 88px
 - Image region: y=27.5% to y=78.9%
+- 1:1 images are cover-fitted (center-cropped to fill width)
 - Gradient overlays at image top/bottom edges
-- Narration: exactly 2 lines, max 12 chars each, `\n` separated
-- Font: `/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc`
+- display_text: exactly 2 lines, max 12 chars each, `\n` separated
+- narration: 50~80 chars, natural spoken Korean for TTS
 
 ## Tech Stack
 
 - **LLM**: DeepSeek V4 Flash via OpenCode Go API
-- **TTS**: Qwen3-TTS-0.6B (local, `/home/lmo0317/models/Qwen3-TTS-0.6B`)
-- **Image**: Remote ComfyUI at `192.168.219.120:8000` (z_image_turbo_bf16, 6 steps)
+- **TTS**: Qwen3-TTS-0.6B (local)
+- **Image**: Remote ComfyUI at `192.168.219.120:8000` (z_image_turbo_bf16, 1024x1024, 6 steps)
 - **Python venv**: `/home/lmo0317/comfy/ComfyUI/venv/bin/python3`
 - **Output**: `/home/lmo0317/share/final.mp4`
 
 ## Important Notes
 
 - Always search BOTH platforms (YouTube + NatePann) for 리서치 mode
+- Prefer NatePann articles with 200+ chars body length for ~90s videos
 - Korean content is primary — search in Korean
-- Focus on high-engagement content (views, comments, recommends)
-- Default topic is couple/relationship conflict but adapt to user's keyword
 - Video layout must match the reference screenshot style
