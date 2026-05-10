@@ -47,48 +47,34 @@ cd /home/lmo0317/shorts_v2/script && /home/lmo0317/comfy/ComfyUI/venv/bin/python
 
 ## Skill: Content Research (콘텐츠 리서치)
 
-When the user asks to find content ideas for shorts, follow this workflow to search BOTH YouTube Shorts AND NatePann, then present results in a unified table format.
+### Invocation
+User says: "리서치 해줘", "콘텐츠 찾아줘", "소스 가져와", etc. with a topic keyword.
 
-### Step 1: Search YouTube Shorts
-Use webfetch to search YouTube for popular shorts on the given topic. Try multiple search queries:
-
-```
-https://www.youtube.com/results?search_query={KEYWORD}+쇼츠
-```
-
-Search keywords to combine with the topic (use Korean):
-- `{topic} 쇼츠`
-- `{topic} 연애 쇼츠`
-- `{topic} 갈등 쇼츠`
-- `{topic} 질문 쇼츠`
-- `{topic} 사연 쇼츠`
-
-For each result found, collect:
-- Title
-- Brief content summary (1-2 sentences)
-- View count (if available)
-- Comments/engagement (if available)
-
-### Step 2: Search NatePann
-The project already has a crawler (`script/crawler.py`). For content research, also use webfetch to search NatePann:
-
-```
-https://m.search.nate.com/search/search.html?q={KEYWORD}&ss=natepann
+### How to Run
+```bash
+cd /home/lmo0317/shorts_v2/script && /home/lmo0317/comfy/ComfyUI/venv/bin/python3 research.py [키워드] [옵션]
 ```
 
-Alternatively, browse NatePann hot articles:
-```
-https://pann.nate.com/talk/ranking
+Options:
+- `--nate N` - NatePann results count (default: 10)
+- `--youtube N` - YouTube results count (default: 10)
+- `--ranking` - Use NatePann hot ranking instead of keyword search
+- `--json` - Output as JSON
+
+Examples:
+```bash
+# 커플 갈등 리서치
+python3 research.py 커플 갈등
+
+# 연애 서운함 리서치 (JSON 출력)
+python3 research.py 연애 서운함 --json
+
+# 네이트판 인기글 리서치
+python3 research.py --ranking
 ```
 
-For each post, collect:
-- Title
-- Brief content summary
-- View count
-- Comment count / recommends
-
-### Step 3: Present Results
-Format results as TWO separate tables with these columns:
+### Output Format
+Always present results as TWO tables:
 
 **YouTube Shorts:**
 
@@ -102,17 +88,14 @@ Format results as TWO separate tables with these columns:
 |---|------|----------|------------|
 | 1 | ... | ... | ... |
 
-Present ~10 items from each source. Sort by popularity (views/recommends).
+### Fallback
+If `research.py` script results are insufficient (YouTube scraping is limited without API), supplement with:
+1. Use the Task tool (subagent_type "general") to webfetch search YouTube and NatePann
+2. Combine script results + web search results
+3. Present in the same table format
 
-### Step 4: After User Selection
+### After User Selection
 Once user picks topics, use the pipeline to:
-1. Either crawl from NatePann using `get_top_by_views()` or use the selected topic as source
+1. Crawl from NatePann using `get_top_by_views()` or use selected topic as source
 2. Run `ai_rewrite.py` to create scenes with 2-line narrations
 3. Generate images, TTS, and video
-
-### Important Notes
-- Always search BOTH platforms (YouTube + NatePann)
-- Use the Task tool with subagent_type "general" for parallel web searches
-- Korean content is primary - search in Korean
-- Focus on high-engagement content (views, comments, recommends)
-- The user prefers couple/relationship conflict topics by default but may ask for other themes
