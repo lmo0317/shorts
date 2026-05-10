@@ -20,7 +20,7 @@ Search YouTube Shorts AND NatePann for trending content. Default keyword: 연애
 - `/shorts 리서치 이별 후회` — search breakup regret
 
 **Steps:**
-1. Run: `cd /home/lmo0317/shorts_v2/script && /home/lmo0317/comfy/ComfyUI/venv/bin/python3 research.py [KEYWORD]`
+1. Run: `cd /home/lmo0317/shorts_v2/script && /home/lmo0317/miniconda3/envs/qwen-tts/bin/python research.py [KEYWORD]`
 2. Options: `--nate N`, `--youtube N`, `--ranking`, `--json`
 3. If script results are insufficient (especially YouTube), supplement with Task tool (subagent_type "general") web searches
 4. Present results as TWO formatted tables. NatePann table includes **본문길이** column — prefer articles with 200+ characters for longer videos.
@@ -49,7 +49,7 @@ Run the full shorts pipeline to generate a final video (~90 seconds).
 
 If no argument provided (default):
 ```bash
-cd /home/lmo0317/shorts_v2/script && /home/lmo0317/comfy/ComfyUI/venv/bin/python3 main.py --articles 1
+cd /home/lmo0317/shorts_v2/script && /home/lmo0317/miniconda3/envs/qwen-tts/bin/python main.py --articles 1
 ```
 
 ## Pipeline Architecture
@@ -89,7 +89,7 @@ cd /home/lmo0317/shorts_v2/script && /home/lmo0317/comfy/ComfyUI/venv/bin/python
 - **LLM**: DeepSeek V4 Flash via OpenCode Go API
 - **TTS**: Qwen3-TTS-0.6B (local)
 - **Image**: Remote ComfyUI at `192.168.219.120:8000` (z_image_turbo_bf16, 1024x1024, 6 steps)
-- **Python venv**: `/home/lmo0317/comfy/ComfyUI/venv/bin/python3`
+- **Python venv**: `/home/lmo0317/miniconda3/envs/qwen-tts/bin/python`
 - **Output**: `/home/lmo0317/share/final.mp4`
 
 ## Important Notes

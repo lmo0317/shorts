@@ -8,7 +8,7 @@ Automated shorts video pipeline: crawl -> AI rewrite -> TTS -> image gen -> vide
 - **TTS**: Qwen3-TTS-0.6B (local, `/home/lmo0317/models/Qwen3-TTS-0.6B`)
 - **Image**: Remote ComfyUI at `192.168.219.120:8000` (z_image_turbo_bf16, 6 steps)
 - **Video**: 1080x1920 portrait, NotoSansCJK-Bold, dark theme + gold accent
-- **Python venv**: `/home/lmo0317/comfy/ComfyUI/venv/bin/python3`
+- **Python venv**: `/home/lmo0317/miniconda3/envs/qwen-tts/bin/python`
 - **Output**: `/home/lmo0317/share/final.mp4`
 
 ## Key Files
@@ -33,14 +33,13 @@ Automated shorts video pipeline: crawl -> AI rewrite -> TTS -> image gen -> vide
 ## Pipeline Order
 1. Crawl articles (`crawler.py`)
 2. AI rewrite (`ai_rewrite.py`) - produces 2-line narrations per scene
-3. Generate images (remote ComfyUI)
-4. Free local GPU memory (`free_comfy_memory()`)
-5. Generate TTS (local Qwen3-TTS)
-6. Assemble video (`video_edit.py`)
+3. Generate images (remote ComfyUI at 192.168.219.120:8000)
+4. Generate TTS (local Qwen3-TTS)
+5. Assemble video (`video_edit.py`)
 
 ## Run Command
 ```bash
-cd /home/lmo0317/shorts_v2/script && /home/lmo0317/comfy/ComfyUI/venv/bin/python3 main.py --articles 1
+cd /home/lmo0317/shorts_v2/script && /home/lmo0317/miniconda3/envs/qwen-tts/bin/python main.py --articles 1
 ```
 
 ---
@@ -52,7 +51,7 @@ User says: "리서치 해줘", "콘텐츠 찾아줘", "소스 가져와", etc. w
 
 ### How to Run
 ```bash
-cd /home/lmo0317/shorts_v2/script && /home/lmo0317/comfy/ComfyUI/venv/bin/python3 research.py [키워드] [옵션]
+cd /home/lmo0317/shorts_v2/script && /home/lmo0317/miniconda3/envs/qwen-tts/bin/python research.py [키워드] [옵션]
 ```
 
 Options:

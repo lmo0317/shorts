@@ -1,4 +1,4 @@
-import sys, os, json, time, requests
+import sys, os, json, time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -11,14 +11,6 @@ from video_edit import create_clips
 
 def log(msg):
     print(f"[{time.strftime('%H:%M:%S')}] {msg}", flush=True)
-
-def free_comfy_memory():
-    try:
-        r = requests.post("http://127.0.0.1:8188/free", json={"unload_models": True, "free_memory": True}, timeout=10)
-        log(f"ComfyUI 메모리 해제: {r.status_code}")
-    except Exception as e:
-        log(f"ComfyUI 메모리 해제 실패: {e}")
-    time.sleep(3)
 
 def run_pipeline(scenes):
     for s in scenes:
@@ -38,8 +30,6 @@ def run_pipeline(scenes):
         log(f"이미지 생성 실패: {e}")
         return
     log(f"이미지 완료: {len(image_paths)}장")
-
-    free_comfy_memory()
 
     log("TTS 생성 중...")
     narrations = [s["narration"] for s in scenes]

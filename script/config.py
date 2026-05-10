@@ -18,6 +18,7 @@ COMFY_OUTPUT = None
 TTS_MODEL_PATH = "/home/lmo0317/models/Qwen3-TTS-0.6B"
 TTS_REF_VOICE = "/tmp/ref_voice.wav"
 TTS_SAMPLE_RATE = 24000
+TTS_PYTHON = "/home/lmo0317/miniconda3/envs/qwen-tts/bin/python"
 
 NUM_SCENES = 6
 
