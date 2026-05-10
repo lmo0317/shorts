@@ -1,6 +1,6 @@
 import os, subprocess, json
 from math import ceil
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 from config import VIDEO_DIR, SHARE_DIR, OUTPUT_DIR
 
@@ -35,6 +35,10 @@ def make_frame(image_path, display_text):
     canvas = Image.new("RGB", (W, H), BLACK)
 
     img = Image.open(image_path).convert("RGB")
+
+    from PIL import ImageFilter
+    img = img.filter(ImageFilter.SMOOTH)
+
     img_w, img_h = img.size
     crop_h = IMG_BOTTOM - IMG_TOP
     if img_w >= img_h:

@@ -29,6 +29,6 @@ COMFY_WORKFLOW = {
     "5": {"class_type": "EmptyLatentImage", "inputs": {"width": 1024, "height": 1024, "batch_size": 1}},
     "10": {"class_type": "VAELoader", "inputs": {"vae_name": "ae.safetensors"}},
     "8": {"class_type": "VAEDecode", "inputs": {"samples": ["9", 0], "vae": ["10", 0]}},
-    "9": {"class_type": "KSampler", "inputs": {"seed": 42, "steps": 6, "cfg": 2.0, "sampler_name": "euler", "scheduler": "sgm_uniform", "denoise": 1.0, "model": ["3", 0], "positive": ["6", 0], "negative": ["7", 0], "latent_image": ["5", 0]}},
+    "9": {"class_type": "KSampler", "inputs": {"seed": 42, "steps": 12, "cfg": 2.0, "sampler_name": "euler", "scheduler": "sgm_uniform", "denoise": 1.0, "model": ["3", 0], "positive": ["6", 0], "negative": ["7", 0], "latent_image": ["5", 0]}},
     "11": {"class_type": "SaveImage", "inputs": {"filename_prefix": "shorts", "images": ["8", 0]}},
 }

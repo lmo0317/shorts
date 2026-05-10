@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Shorts 대본 스키마",
+  "description": "쇼츠 영상 자동 생성용 대본. 이 JSON 형식으로 파일을 작성하면 바로 파이프라인을 실행할 수 있습니다.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["scene", "display_text", "narration", "image_prompt"],
+    "properties": {
+      "scene": {
+        "type": "integer",
+        "description": "장면 번호 (1부터 시작)",
+        "minimum": 1
+      },
+      "summary": {
+        "type": "string",
+        "description": "한 줄 요약 (선택사항)"
+      },
+      "display_text": {
+        "type": "string",
+        "description": "화면에 표시될 텍스트. 반드시 \\n으로 2줄. 첫줄=흰색, 둘째줄=골드. 각 줄 12자 이내.",
+        "pattern": ".+\\n.+",
+        "examples": [
+          "술 유흥\\n위험 신호",
+          "결혼 전\\n꼭 확인하자",
+          "다정하고 독립적인\\n책임감 있는 남자"
+        ]
+      },
+      "narration": {
+        "type": "string",
+        "description": "TTS로 읽힐 구어체 대본. 70~100자. 감정 있게, 자연스럽게.",
+        "minLength": 30,
+        "maxLength": 200,
+        "examples": [
+          "술을 좋아하고 유흥을 즐기는 남자는 결혼 후에도 변하지 않아요. 이런 남자와 결혼하면 인생이 피곤해질 거예요."
+        ]
+      },
+      "image_prompt": {
+        "type": "string",
+        "description": "영문 이미지 생성 프롬프트. 50단어 이상. photorealistic, Korean style 포함.",
+        "minLength": 30,
+        "examples": [
+          "A worried Korean woman in her late 20s sitting alone at a bar, looking at her phone with a sad expression. The bar is dimly lit with warm amber lights. She wears a white blouse. Her boyfriend is visible in the background chatting with another woman. Cinematic lighting, sharp focus, masterpiece, best quality, 8k, photorealistic, Korean style, highly detailed, emotional, dramatic."
+        ]
+      }
+    }
+  },
+  "minItems": 4,
+  "maxItems": 8,
+  "examples": [
+    [
+      {
+        "scene": 1,
+        "summary": "위험한 남자 red flags",
+        "display_text": "결혼 전\n꼭 확인하자",
+        "narration": "결혼 전에 꼭 확인해야 할 것들이 있어요. 몇 가지 패턴만 알아도 나중에 큰 후회를 막을 수 있어요.",
+        "image_prompt": "A Korean woman in her late 20s looking concerned while sitting at a cafe table. She holds a pen and notebook as if writing a checklist. Warm morning light streams through the window. The atmosphere is serious and thoughtful. masterpiece, best quality, 8k, cinematic lighting, photorealistic, Korean style, sharp focus, highly detailed."
+      },
+      {
+        "scene": 2,
+        "summary": "술과 유흥",
+        "display_text": "술 유흥\n위험 신호",
+        "narration": "술을 좋아하고 유흥을 즐기는 남자는 결혼 후에도 변하지 않아요. 이런 남자와 결혼하면 인생이 피곤해질 거예요.",
+        "image_prompt": "A Korean man drinking at a noisy nightclub, surrounded by people. A worried woman watches from a distance with her arms crossed. Neon lights, crowded atmosphere. The mood is tense and uncomfortable. masterpiece, best quality, 8k, cinematic lighting, photorealistic, Korean style, sharp focus, highly detailed."
+      },
+      {
+        "scene": 3,
+        "summary": "마마보이",
+        "display_text": "마마보이\n조심하세요",
+        "narration": "엄마 말만 듣는 마마보이는 결혼 후에도 부모님에게 휘둘려요. 정서적 독립이 안 된 남자는 피하는 게 좋아요.",
+        "image_prompt": "A Korean man on the phone with his mother while his frustrated wife sits across the table. Traditional Korean dining setting. The husband looks conflicted, the wife looks resigned. Warm indoor lighting. masterpiece, best quality, 8k, cinematic lighting, photorealistic, Korean style, sharp focus, highly detailed."
+      },
+      {
+        "scene": 4,
+        "summary": "빚과 병력",
+        "display_text": "빚 병력\n꼭 확인",
+        "narration": "빚이 있거나 병력 이력이 있는 남자는 결혼 생활에 큰 부담이 될 수 있어요. 결혼 전에 꼭 확인해야 해요.",
+        "image_prompt": "A Korean couple having a serious conversation at home. Documents and bills are spread on the table. The woman looks worried, the man looks uncomfortable. Soft evening light through curtains. masterpiece, best quality, 8k, cinematic lighting, photorealistic, Korean style, sharp focus, highly detailed."
+      },
+      {
+        "scene": 5,
+        "summary": "좋은 남자의 특징",
+        "display_text": "다정하고\n독립적인",
+        "narration": "다정하고 한 여자만 사랑하며 독립적인 남자, 이런 남자와 결혼하면 행복할 확률이 높아요.",
+        "image_prompt": "A happy Korean couple walking together in a park during golden hour. They hold hands gently. The man looks at her with warmth and respect. Autumn leaves, soft warm light. The mood is peaceful and loving. masterpiece, best quality, 8k, cinematic lighting, photorealistic, Korean style, sharp focus, highly detailed."
+      },
+      {
+        "scene": 6,
+        "summary": "마무리",
+        "display_text": "책임감 있는\n든든한 남자",
+        "narration": "책임감 있고 부모와 정서적 독립이 되어 있으며 경제 관념이 있는 남자, 이런 남자가 진짜 좋은 남편감이에요.",
+        "image_prompt": "A confident Korean man in his early 30s standing in a modern apartment, looking out the window with a peaceful expression. Warm golden light. He wears a neat casual shirt. The atmosphere is hopeful and calm. masterpiece, best quality, 8k, cinematic lighting, photorealistic, Korean style, sharp focus, highly detailed."
+      }
+    ]
+  ]
+}
